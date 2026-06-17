@@ -1,0 +1,14 @@
+  public Personaje obtener(long id) {
+    	Personaje p = null;
+        try {
+        	Session session = ConnectionUtil.getSessionFactory().openSession();
+        	p = session.find(Personaje.class, id);
+            session.close();
+            if (p == null) {
+            	System.out.println("No se encontró el personaje con id=" + id);
+            }
+        } catch (Exception e) {
+            System.out.println("Error al obtener personaje id=" + id + ": " + e.getMessage());
+        }
+        return p;
+    }
