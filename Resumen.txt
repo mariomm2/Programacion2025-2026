@@ -1,0 +1,105 @@
+// QUERY SIMPLE
+
+CriteriaQuery<Producto> cquery = session.getCriteriaBuilder().createQuery(Producto.class); 
+
+cquery.select(cquery.from(Producto.class)); 
+
+return session.createQuery(cquery).list(); 
+
+
+// QUERY MENOS SIMPLE 
+
+Query<Producto> query = session.createQuery(" from Producto p " + " where p.id = :id" , Producto.class).setParameter("id", id); 
+
+return query.uniqueResult(); 
+
+
+// QUERY COMPLEJA
+
+public List<Producto> buscarProductosPorFechaAlta(LocalDate comienzo, LocalDate fin) {
+Session s = ConnectionUtil.getSessionFactory().openSession();
+
+CriteriaBuilder cb = session.getCriteriaBuilder(); 
+
+CriteriaQuery<Producto> cquery = cb.createQuery(Producto.class); 
+
+Root<Producto> root = cquery.from(Producto.class); 
+
+cquery.select(root);
+
+cquery.where(cb.and(cb.greaterThanOrEqualTo(root.get("fechaAlta"), comienzo), 
+cb.lessThanOrEqualTo(root.get("fechaAlta"), fin)));  
+
+Query<Producto> query = session.createQuery(cquery); 
+return query.getResultList(); 
+
+
+// EJEMPLO CRUD LEER
+
+public void obtener() {
+
+Session sesión = ConnectionUtil.getSessionFactory().openSession();
+sesión.beginTransaction();
+
+var producto = sesión.find(Producto.class, 1L);
+
+sesión.close();}
+
+
+// EJEMPLO CRUD ACTUALIZAR
+
+public void actualizar() {
+
+Session session = ConnectionUtil.getSessionFactory().openSession();
+sesión.beginTransaction();
+var producto = session.find(Producto.class, 1L);
+
+producto.setDescripcion("Nuevo producto");
+
+session.merge(producto);
+session.getTransaction().commit();
+
+session.close();}
+
+// EJEMPLO CRUD ELIMINAR
+
+public void eliminar() {
+
+Session session = ConnectionUtil.getSessionFactory().openSession();
+session.beginTransaction();
+session.remove(session.find(Producto.class, 1L));
+
+session.getTransaction().commit();
+
+session.close();}
+
+
+// EJEMPLO UNION TABLAS
+
+@ManyToOne(optional=false)
+@JoinColumn(name="id_pedido", foreignKey = @ForeignKey(name="pedido_id_fk"), nullable=false, updatable = false)
+
+// EJEMPLO CRUD GRUPOS
+
+ServicioPersistencia<Pedido> servicioPedido = new ServicioPersistencia<Pedido>();
+Pedido pedido = new Pedido();
+servicioPedido.persistirObjeto(pedido);
+
+LineaPedido lp1 = new LineaPedido(producto1, 3, "LP135-7A", pedido);
+LineaPedido lp2 = new LineaPedido(producto2, 1, "LP135-7B", pedido);
+
+ServicioPersistencia<LineaPedido> servicioPersistenciaLinea = new ServicioPersistencia<LineaPedido>();
+servicioPersistenciaLinea.persistirObjeto(lp1);
+servicioPersistenciaLinea.persistirObjeto(lp2);
+
+
+// EJEMPLO COMANDOS
+
+docker exec -it mysql_db /bin/bash
+
+mysql -uroot -p 
+
+GRANT ALL PRIVILEGES ON tienda_virtual TO 'root'@'localhost' WITH GRANT 
+OPTION;
+
+
